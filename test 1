@@ -1,1 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node
+{
+    char *data;
+    struct Node *left;
+    struct Node *right;
+} Node;
+
+Node *newNode(char *data)
+{
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->data = (char *)malloc(strlen(data) + 1);
+    strcpy(node->data, data);
+    node->left = NULL;
+    node->right = NULL;
+    return node;
+}
+
+Node *insert(Node *root, char *data)
+{
+    if (root == NULL)
+    {
+        Node *n = newNode(data);
+        root = n;
+    }
+    else
+    {
+        if (strcasecmp(data, root->data) < 0)
+        {
+            root->left = insert(root->left, data);
+        }
+        else
+        {
+            root->right = insert(root->right, data);
+        }
+    }
+    return root;
+}
+
+void readfile(Node **root)
+{
+    FILE *fp = fopen("EN-US-Dictionary.txt", "r");
+    char line[50];
+
+    if (fp == NULL)
+    {
+        printf("Error opening file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    while (fscanf(fp, "%s", line) != EOF)
+    {
+        *root = insert(*root, line);
+    }
+
+    fclose(fp);
+}
+
+void printInorder(Node *node)
+{
+    if (node == NULL)
+        return;
+    printInorder(node->left);
+    printf("%s\n", node->data);
+    printInorder(node->right);
+}
+
+int main()
+{
+    Node *root = NULL;
+    readfile(&root);
+    printInorder(root);
+
+    return 0;
+}
 
